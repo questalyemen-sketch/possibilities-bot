@@ -27,8 +27,8 @@ logging.getLogger("httpcore").setLevel(logging.WARNING)
 LOGGER = logging.getLogger("possibilities-bot")
 
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
-OPENAI_KEY = os.getenv("OPENAI_API_KEY", "").strip()
-OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini").strip()
+OPENROUTER_KEY = os.getenv("OPENROUTER_API_KEY", "").strip()
+OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "openrouter/free").strip()
 DB_PATH = Path(os.getenv("DATABASE_PATH", "data/possibilities.db"))
 
 FALLBACK_BRANCHES = [
@@ -111,7 +111,7 @@ def select_branch(user_id: int, index: int) -> None:
 
 
 async def generate_branches(decision: str) -> list[dict[str, Any]]:
-    if not OPENAI_KEY:
+    if not OPENROUTER_KEY:
         return FALLBACK_BRANCHES
 
     system_prompt = """
@@ -122,7 +122,7 @@ async def generate_branches(decision: str) -> list[dict[str, Any]]:
 كل نص بين 35 و70 كلمة، دافئ ومثير للتأمل، وتجنب التخويف أو الوعود المضمونة.
 """.strip()
     payload = {
-        "model": OPENAI_MODEL,
+        "model": OPENROUTER_MODEL,
         "temperature": 0.9,
         "response_format": {"type": "json_object"},
         "messages": [
@@ -133,8 +133,10 @@ async def generate_branches(decision: str) -> list[dict[str, Any]]:
     try:
         async with httpx.AsyncClient(timeout=45) as client:
             response = await client.post(
-                "https://api.openai.com/v1/chat/completions",
-                headers={"Authorization": f"Bearer {OPENAI_KEY}"},
+                "https://openrouter.ai/api/v1/chat/completions",
+                headers={"Authorization": f"Bearer {OPENROUTER_KEY}",
+                    "HTTP-Referer": os.getenv("OPENROUTER_SITE_URL", "https://github.com/questalyemen-sketch/possibilities-bot"),
+                    "X-Title": os.getenv("OPENROUTER_APP_NAME", "بوابة الاحتمالات"),},
                 json=payload,
             )
             response.raise_for_status()
