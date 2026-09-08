@@ -22,6 +22,8 @@ from telegram.ext import (
 
 load_dotenv()
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+logging.getLogger("httpx").setLevel(logging.WARNING)
+logging.getLogger("httpcore").setLevel(logging.WARNING)
 LOGGER = logging.getLogger("possibilities-bot")
 
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
