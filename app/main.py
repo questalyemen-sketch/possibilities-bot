@@ -136,7 +136,7 @@ async def generate_branches(decision: str) -> list[dict[str, Any]]:
                 "https://openrouter.ai/api/v1/chat/completions",
                 headers={"Authorization": f"Bearer {OPENROUTER_KEY}",
                     "HTTP-Referer": os.getenv("OPENROUTER_SITE_URL", "https://github.com/questalyemen-sketch/possibilities-bot"),
-                    "X-Title": os.getenv("OPENROUTER_APP_NAME", "بوابة الاحتمالات"),},
+                    "X-Title": os.getenv("OPENROUTER_APP_NAME", "Possibilities Bot"),},
                 json=payload,
             )
             response.raise_for_status()
