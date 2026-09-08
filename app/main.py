@@ -12,6 +12,7 @@ from typing import Any
 import httpx
 from dotenv import load_dotenv
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram.error import NetworkError
 from telegram.ext import (
     Application,
     CallbackQueryHandler,
@@ -186,6 +187,13 @@ def format_branches(decision: str, branches: list[dict[str, Any]]) -> str:
     return "\n".join(lines)
 
 
+async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if isinstance(context.error, NetworkError):
+        LOGGER.warning("Temporary Telegram network hiccup; polling will retry")
+        return
+    LOGGER.exception("Unhandled bot error", exc_info=context.error)
+
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(
         "مرحبًا بك في 🪞 بوابة الاحتمالات.\n\n"
@@ -264,6 +272,7 @@ def main() -> None:
     application.add_handler(CommandHandler("reset", reset))
     application.add_handler(CallbackQueryHandler(choose_branch, pattern=r"^choose:"))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, decision_message))
+    application.add_error_handler(error_handler)
     LOGGER.info("Possibilities bot is running")
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 
