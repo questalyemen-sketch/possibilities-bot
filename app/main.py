@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import logging
 import os
+import re
 import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
@@ -119,7 +120,7 @@ async def generate_branches(decision: str) -> list[dict[str, Any]]:
 حوّل قرار المستخدم إلى ثلاثة مسارات تخيلية مختلفة: الجريء، الآمن، والغريب.
 أعد JSON صالحًا فقط بهذا الشكل:
 {"branches":[{"title":"...","mood":"...","text":"...","first_step":"..."}, ...]}
-كل نص بين 35 و70 كلمة، دافئ ومثير للتأمل، وتجنب التخويف أو الوعود المضمونة.
+اكتب كل الحقول بالعربية فقط، دون أي كلمات إنجليزية. كل نص بين 35 و70 كلمة، دافئ ومثير للتأمل، وتجنب التخويف أو الوعود المضمونة.
 """.strip()
     payload = {
         "model": OPENROUTER_MODEL,
@@ -143,7 +144,9 @@ async def generate_branches(decision: str) -> list[dict[str, Any]]:
             raw = response.json()["choices"][0]["message"]["content"]
             parsed = json.loads(raw)
             branches = parsed.get("branches", [])
-            if len(branches) >= 3:
+            arabic_text = json.dumps(branches, ensure_ascii=False)
+            arabic_chars = len(re.findall(r'[\u0600-\u06FF]', arabic_text))
+            if len(branches) >= 3 and arabic_chars >= 12:
                 return branches[:3]
     except Exception:
         LOGGER.exception("AI generation failed; using fallback branches")
