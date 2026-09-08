@@ -2,7 +2,7 @@
 
 بوت Telegram عربي يحوّل القرارات إلى ثلاثة مسارات بديلة قابلة للاستكشاف.
 
-> التجربة سردية وتأملية وليست تنبؤًا حقيقيًا أو نصيحة مهنية/طبية/مالية.
+> التجربة سردية وتأملية وليست تنبؤًا حقيقيًا أو نصيحة مهنية أو طبية أو مالية.
 
 ## ما يعمل الآن
 
@@ -15,28 +15,20 @@
 - استخدام نموذج لغوي اختياريًا عبر OPENAI_API_KEY
 - وضع احتياطي يعمل بلا نموذج لغوي للمعاينة والتطوير
 
-## التشغيل
+## التشغيل محليًا
 
 1. أنشئ بوتًا من @BotFather وخذ TELEGRAM_BOT_TOKEN.
 2. انسخ .env.example إلى .env.
 3. ضع المفاتيح في بيئة التشغيل، وليس في GitHub.
 4. ثبّت الاعتمادات:
 
-
-a```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-
-a```
+       python -m venv .venv
+       source .venv/bin/activate
+       pip install -r requirements.txt
 
 5. شغّل:
 
-
-a```bash
-python -m app.main
-
-a```
+       python -m app.main
 
 ## المتغيرات
 
@@ -44,6 +36,11 @@ a```
 - OPENAI_API_KEY: اختياري لتوليد قصص أكثر تخصيصًا
 - OPENAI_MODEL: افتراضيًا gpt-4o-mini
 - DATABASE_PATH: افتراضيًا data/possibilities.db
+
+## تشغيل Docker
+
+       docker build -t possibilities-bot .
+       docker run --env-file .env possibilities-bot
 
 ## الخطوة التالية
 
